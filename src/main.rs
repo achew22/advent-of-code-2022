@@ -4,20 +4,31 @@ use std::io;
 
 mod day1;
 
+type challenge = fn(&String) -> String;
+
 struct Day {
     pub name: String,
-    pub f: fn(String) -> String,
+    pub first: challenge,
+    pub second: challenge,
+}
+
+fn null_second(_: &String) -> String {
+    "".to_string()
 }
 
 impl Day {
-    fn new(name: String, f: fn(String) -> String) -> Self {
-        Self { name, f }
+    fn new(name: String, first: challenge, second: challenge) -> Self {
+        Self {
+            name,
+            first,
+            second,
+        }
     }
 }
 
 fn main() {
     let days = vec![
-        Day::new("Calorie Counting".into(), day1::run),
+        Day::new("Calorie Counting".into(), day1::first, day1::second),
         // Future days go here
     ];
     for (i, day) in days.iter().enumerate() {
@@ -25,8 +36,9 @@ fn main() {
         let res = fs::read_to_string(&file_path);
         match res {
             Ok(contents) => {
-                let res = (day.f)(contents);
-                println!("{} => {}", day.name, res);
+                let res1 = (day.first)(&contents);
+                let res2 = (day.second)(&contents);
+                println!("{} => {}, {}", day.name, res1, res2);
             }
             Err(e) => {
                 println!("Unable to read {file_path}: {e}")
